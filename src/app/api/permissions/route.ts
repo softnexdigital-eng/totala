@@ -1,0 +1,27 @@
+import { NextResponse } from 'next/server';
+import { getAuthToken } from '@/lib/serverAuth';
+
+export async function GET() {
+  try {
+    const token = await getAuthToken();
+
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const response = await fetch(`${process.env.BACKEND_URL}/api/agents/permissions/structure`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
