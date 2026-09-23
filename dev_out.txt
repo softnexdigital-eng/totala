@@ -1,0 +1,147 @@
+   ▲ Next.js 14.0.4
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+ ✓ Ready in 1575ms
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 4.5s (442 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 367ms (223 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1102ms (580 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 533ms (64 modules)
+ ✓ Compiled /api/public-agents in 268ms (313 modules)
+ ✓ Compiled /public-agents in 110ms (316 modules)
+ ✓ Compiled in 655ms (298 modules)
+ ✓ Compiled /bookings/new in 207ms (633 modules)
+ ✓ Compiled /login in 332ms (640 modules)
+ ✓ Compiled /api/public-agents in 432ms (323 modules)
+ ✓ Compiled (325 modules)
+ ✓ Compiled /api/public/booking-requests in 193ms (326 modules)
+ ✓ Compiled /api/public-agents in 475ms (316 modules)
+ ○ Compiling /api/public/booking-requests ...
+ ✓ Compiled /api/public/booking-requests in 529ms (317 modules)
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 1076ms (320 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 5.5s (796 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\Dakdin\totala\.next\server\vendor-chunks\goober.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/goober' in D:\Dakdin\totala\.next\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\vendor-chunks\goober.js', but to 'Error: Can't resolve './vendor-chunks/goober' in 'D:\Dakdin\totala\.next\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/goober (expected D:\Dakdin\totala\.next\server\vendor-chunks\goober.js)
+<w>  at file dependencies D:\Dakdin\totala\.next\server\webpack-runtime.js
+<w>  at file D:\Dakdin\totala\.next\server\webpack-runtime.js
+<w>  at file dependencies D:\Dakdin\totala\.next\server\pages\_error.js
+<w>  at file D:\Dakdin\totala\.next\server\pages\_error.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/react-hot-toast' in D:\Dakdin\totala\.next\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\vendor-chunks\react-hot-toast.js', but to 'Error: Can't resolve './vendor-chunks/react-hot-toast' in 'D:\Dakdin\totala\.next\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/react-hot-toast (expected D:\Dakdin\totala\.next\server\vendor-chunks\react-hot-toast.js)
+<w>  at file dependencies D:\Dakdin\totala\.next\server\webpack-runtime.js
+<w>  at file D:\Dakdin\totala\.next\server\webpack-runtime.js
+<w>  at file dependencies D:\Dakdin\totala\.next\server\pages\_error.js
+<w>  at file D:\Dakdin\totala\.next\server\pages\_error.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+ ○ Compiling /api/public-agents ...
+ ✓ Compiled /api/public-agents in 3.1s (353 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\Dakdin\totala\.next\server\app\not-found.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/not-found' in D:\Dakdin\totala\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\app\not-found.js', but to 'Error: Can't resolve '../../../../.next/server/app/not-found' in 'D:\Dakdin\totala\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/not-found (expected D:\Dakdin\totala\.next\server\app\not-found.js)
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/(auth)/login/page' in D:\Dakdin\totala\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\app\(auth)\login\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/(auth)/login/page' in 'D:\Dakdin\totala\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/(auth)/login/page (expected D:\Dakdin\totala\.next\server\app\(auth)\login\page.js)
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+ ✓ Compiled in 33.7s (437 modules)
+ ✓ Compiled in 873ms (437 modules)
+ ✓ Compiled in 9.5s (437 modules)
+ ○ Compiling /api/public/booking-requests ...
+ ✓ Compiled /api/public/booking-requests in 1554ms (354 modules)
+ ✓ Compiled in 818ms (791 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\Dakdin\totala\.next\server\app\not-found.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/not-found' in D:\Dakdin\totala\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\app\not-found.js', but to 'Error: Can't resolve '../../../../.next/server/app/not-found' in 'D:\Dakdin\totala\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/not-found (expected D:\Dakdin\totala\.next\server\app\not-found.js)
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+ ✓ Compiled /not-found in 301ms (334 modules)
+ ○ Compiling /agent-login ...
+ ✓ Compiled /agent-login in 547ms (777 modules)
+ ✓ Compiled /api/agents/login in 129ms (366 modules)
+ ✓ Compiled /agent-dashboard in 392ms (814 modules)
+ ✓ Compiled /api/tasks in 75ms (387 modules)
+ ✓ Compiled (390 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\Dakdin\totala\.next\server\app\(auth)\login\page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/(auth)/login/page' in D:\Dakdin\totala\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\app\(auth)\login\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/(auth)/login/page' in 'D:\Dakdin\totala\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/(auth)/login/page (expected D:\Dakdin\totala\.next\server\app\(auth)\login\page.js)
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\export\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+ ○ Compiling /appointments ...
+ ✓ Compiled /appointments in 831ms (851 modules)
+ ✓ Compiled /api/agents/me in 108ms (409 modules)
+ ✓ Compiled /api/agents in 104ms (411 modules)
+ ✓ Compiled /doctor-booking in 264ms (865 modules)
+ ✓ Compiled /api/appointments in 254ms (419 modules)
+ ✓ Compiled (425 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\Dakdin\totala\.next\server\app\(auth)\login\page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/(auth)/login/page' in D:\Dakdin\totala\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\Dakdin\totala\.next\server\app\(auth)\login\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/(auth)/login/page' in 'D:\Dakdin\totala\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/(auth)/login/page (expected D:\Dakdin\totala\.next\server\app\(auth)\login\page.js)
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\worker.js
+<w>  at file dependencies D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\Dakdin\totala\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js

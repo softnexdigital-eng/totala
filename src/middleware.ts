@@ -9,6 +9,12 @@ export function middleware(request: NextRequest) {
   const publicRoutes = ['/login', '/api/agents/login', '/agent-login'];
   const isPublicRoute = publicRoutes.includes(pathname);
 
+  // Patient-facing booking page linked from the public landing page. It must be
+  // reachable without a session (logged-in admins keep access too).
+  if (pathname === '/bookings/new') {
+    return NextResponse.next();
+  }
+
   const adminRoutes = [
     '/dashboard',
     '/patients',
@@ -19,6 +25,11 @@ export function middleware(request: NextRequest) {
     '/tests',
     '/reports',
     '/doctor-booking',
+    '/tasks',
+    '/payments',
+    '/audit',
+    '/bookings',
+    '/agents/ratings',
   ];
   const isAdminRoute = adminRoutes.includes(pathname) || pathname.startsWith('/dashboard/');
 
@@ -34,6 +45,13 @@ export function middleware(request: NextRequest) {
       pathname === '/api/auth/verify-otp' ||
       pathname === '/api/agents/login'
     ) {
+      return NextResponse.next();
+    }
+
+    // No-auth public endpoints used by the landing page / public agents page:
+    //   /api/public-agents            -> public agent directory
+    //   /api/public/...               -> public booking requests
+    if (pathname === '/api/public-agents' || pathname.startsWith('/api/public/')) {
       return NextResponse.next();
     }
 
@@ -91,6 +109,11 @@ export const config = {
     '/permissions/:path*',
     '/doctor-booking/:path*',
     '/agent-dashboard/:path*',
+    '/tasks/:path*',
+    '/payments/:path*',
+    '/audit/:path*',
+    '/bookings/:path*',
+    '/agents/ratings/:path*',
     '/login',
     '/agent-login',
   ],

@@ -86,9 +86,18 @@ export const endpoints = {
   agents: '/agents',
   permissions: '/permissions',
   appointments: '/appointments',
-  tests: '/tests',
+  tasks: '/tasks',
+  tasksTracking: '/tasks/tracking',
+  payments: '/payments',
   reports: {
     daily: '/reports/daily',
     monthly: '/reports/monthly',
+    financial: '/reports/financial',
+    dailySummary: '/reports/daily-summary',
+  },
+  audit: '/audit-logs',
+  search: '/search',
+  dashboard: {
+    summary: '/dashboard/summary',
   },
 };

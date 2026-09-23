@@ -29,6 +29,7 @@ export default function AgentLoginPage() {
         toast.success('Login successful!');
         document.cookie = `agentToken=${result.data.token}; path=/; max-age=${7 * 24 * 60 * 60}`;
         document.cookie = `agent=${encodeURIComponent(JSON.stringify(result.data.agent))}; path=/; max-age=${7 * 24 * 60 * 60}`;
+        document.cookie = `token=${result.data.token}; path=/; max-age=${7 * 24 * 60 * 60}`;
         router.push('/agent-dashboard');
         router.refresh();
       } else {

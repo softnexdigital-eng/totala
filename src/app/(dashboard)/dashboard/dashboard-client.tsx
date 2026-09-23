@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import PendingAppointments from '@/components/dashboard/PendingAppointments';
+import TaskTrackingSection from '@/components/dashboard/TaskTrackingSection';
+
+interface DashboardSummary {
+  todayAppointments: number;
+  todayTasks: number;
+  completedTasks: number;
+  activeAgents: number;
+  pendingPayments: number;
+  paymentsUnderVerification: number;
+  todayIncome: number;
+  todayExpense: number;
+  todayNet: number;
+}
 
 function IconUsers({ className = 'h-5 w-5' }: { className?: string }) {
   return (
@@ -30,6 +43,41 @@ function IconCalendar({ className = 'h-5 w-5' }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" className={className}>
       <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" strokeWidth="1.6" />
       <path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconClipboard({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function IconCheckCircle({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconCurrency({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconTrendingUp({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M3 17l6-6 4 4 8-8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M14 7h7v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -74,11 +122,13 @@ const TIME_ZONE = 'Asia/Dhaka';
 
 export default function DashboardClient({
   token,
+  summary,
   totalPatients,
   totalDoctors,
   totalAppointments,
 }: {
   token: string;
+  summary: DashboardSummary | null;
   totalPatients: number;
   totalDoctors: number;
   totalAppointments: number;
@@ -113,7 +163,6 @@ export default function DashboardClient({
   const greeting = hour24 === null ? 'Welcome back' : hour24 < 12 ? 'Good morning' : hour24 < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
-    // Scrolls independently of a sticky/fixed sidebar living in the layout around this page.
     <div className="h-screen overflow-y-auto bg-[#FAFAF8]">
       <div className="mx-auto max-w-9xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         {/* Hero header with live local time */}
@@ -125,7 +174,7 @@ export default function DashboardClient({
             <div>
               <p className="text-sm font-medium text-teal-100">{greeting}</p>
               <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">Dashboard</h1>
-              <p className="mt-1 text-sm text-teal-100">An overview of patients, doctors, and appointments.</p>
+              <p className="mt-1 text-sm text-teal-100">An overview of patients, doctors, appointments, and financials.</p>
             </div>
 
             <div className="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 sm:flex-col sm:items-end sm:bg-transparent sm:px-0 sm:py-0">
@@ -160,8 +209,70 @@ export default function DashboardClient({
           />
         </div>
 
+        {/* Phase 2 Stats Cards */}
+        {summary && (
+          <>
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Today's Appointments"
+                value={summary.todayAppointments}
+                icon={<IconCalendar />}
+                tint={{ bg: 'bg-blue-50', text: 'text-blue-700', blob: 'bg-blue-50/70' }}
+              />
+              <StatCard
+                label="Today's Tasks"
+                value={summary.todayTasks}
+                icon={<IconClipboard />}
+                tint={{ bg: 'bg-purple-50', text: 'text-purple-700', blob: 'bg-purple-50/70' }}
+              />
+              <StatCard
+                label="Completed Tasks"
+                value={summary.completedTasks}
+                icon={<IconCheckCircle />}
+                tint={{ bg: 'bg-green-50', text: 'text-green-700', blob: 'bg-green-50/70' }}
+              />
+              <StatCard
+                label="Active Agents"
+                value={summary.activeAgents}
+                icon={<IconUsers />}
+                tint={{ bg: 'bg-indigo-50', text: 'text-indigo-700', blob: 'bg-indigo-50/70' }}
+              />
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Pending Payments"
+                value={summary.pendingPayments}
+                icon={<IconCurrency />}
+                tint={{ bg: 'bg-yellow-50', text: 'text-yellow-700', blob: 'bg-yellow-50/70' }}
+              />
+              <StatCard
+                label="Payments Under Verification"
+                value={summary.paymentsUnderVerification}
+                icon={<IconClock />}
+                tint={{ bg: 'bg-orange-50', text: 'text-orange-700', blob: 'bg-orange-50/70' }}
+              />
+              <StatCard
+                label="Today's Income"
+                value={summary.todayIncome}
+                icon={<IconTrendingUp />}
+                tint={{ bg: 'bg-emerald-50', text: 'text-emerald-700', blob: 'bg-emerald-50/70' }}
+              />
+              <StatCard
+                label="Today's Net"
+                value={summary.todayNet}
+                icon={<IconCurrency />}
+                tint={{ bg: 'bg-cyan-50', text: 'text-cyan-700', blob: 'bg-cyan-50/70' }}
+              />
+            </div>
+          </>
+        )}
+
         {/* Pending Appointments Section */}
         {token && <PendingAppointments token={token} />}
+
+        {/* Task Tracking — super admin sees every agent's live task status + timer */}
+        {token && <TaskTrackingSection token={token} />}
       </div>
     </div>
   );

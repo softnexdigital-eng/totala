@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getAuthToken } from '@/lib/serverAuth';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const token = await getAuthToken();
 
@@ -13,10 +13,18 @@ export async function GET() {
       );
     }
 
-    const response = await fetch(`${process.env.BACKEND_URL}/api/patients`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-      cache: 'no-store',
-    });
+    // Forward query params (e.g. ?phone=...&name=...) so the Doctor Booking
+    // patient field can perform server-side patient search by phone/name.
+    const { searchParams } = new URL(req.url);
+    const query = searchParams.toString();
+
+    const response = await fetch(
+      `${process.env.BACKEND_URL}/api/patients${query ? `?${query}` : ''}`,
+      {
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
+      }
+    );
 
     const data = await response.json();
     return NextResponse.json(data);

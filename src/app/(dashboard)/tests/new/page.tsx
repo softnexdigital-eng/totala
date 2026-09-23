@@ -69,7 +69,7 @@ export default function NewTestPage() {
             <option value="">Select Appointment</option>
             {appointments.map((apt) => (
               <option key={apt.id} value={apt.id}>
-                {apt.patient.name} - {apt.doctor.name}
+                {apt.patient.name} - {apt.doctor?.name || 'Not assigned'}
               </option>
             ))}
           </select>

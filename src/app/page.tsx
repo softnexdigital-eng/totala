@@ -1,12 +1,5 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import LandingPage from '@/components/landing/LandingPage';
 
-export default async function HomePage() {
-  const token = cookies().get('token')?.value;
-
-  if (token) {
-    redirect('/dashboard');
-  }
-
-  redirect('/login');
+export default function HomePage() {
+  return <LandingPage />;
 }

@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { HiOutlineLogout } from 'react-icons/hi';
+import { HiChevronDoubleLeft, HiChevronDoubleRight, HiOutlineLogout } from 'react-icons/hi';
+import { useSidebar } from '@/components/layout/SidebarContext';
 
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -14,11 +15,18 @@ const pageTitles: Record<string, string> = {
   '/doctor-booking': 'Doctor Booking',
   '/packages': 'Manage Packages',
   '/tests': 'Tests',
+  '/tasks': 'Tasks',
+  '/payments': 'Payments',
+  '/bookings': 'Online Bookings',
+  '/agent-booking-requests': 'Agent Booking Requests',
+  '/agents/ratings': 'Agent Ratings',
+  '/audit': 'Audit Report',
   '/reports': 'Reports',
 };
 
 export default function Header() {
   const pathname = usePathname();
+  const { collapsed, toggleCollapsed } = useSidebar();
 
   const handleLogout = async () => {
     try {
@@ -37,6 +45,19 @@ export default function Header() {
       <div className="flex justify-between items-center px-6 lg:px-8 py-4">
         <div className="flex items-center gap-4">
           <div className="lg:hidden w-10" />
+          <button
+            onClick={toggleCollapsed}
+            title={collapsed ? 'Expand sidebar' : 'Minimise sidebar'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Minimise sidebar'}
+            aria-expanded={!collapsed}
+            className="hidden h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 lg:flex"
+          >
+            {collapsed ? (
+              <HiChevronDoubleRight className="h-5 w-5" />
+            ) : (
+              <HiChevronDoubleLeft className="h-5 w-5" />
+            )}
+          </button>
           {title && (
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">

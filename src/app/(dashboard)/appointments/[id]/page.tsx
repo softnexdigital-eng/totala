@@ -7,7 +7,7 @@ import { getStatusLabel, getStatusColor } from '../../../../lib/appointmentStatu
 interface Appointment {
   id: string;
   patient: { id: string; name: string };
-  doctor: { id: string; name: string };
+  doctor?: { id: string; name: string };
   agent?: { name: string };
   date: string;
   status: string;
@@ -52,7 +52,7 @@ export default async function AppointmentDetailPage({
 
         <div>
           <label className="block text-sm font-medium text-gray-500">Doctor</label>
-          <p className="text-lg">{appointment.doctor.name}</p>
+          <p className="text-lg">{appointment.doctor ? appointment.doctor.name : 'Not assigned'}</p>
         </div>
 
         <div>

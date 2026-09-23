@@ -7,13 +7,14 @@ async function getData() {
 
   if (!token) return null;
 
-  const [patients, doctors, appointments] = await Promise.all([
+  const [summary, patients, doctors, appointments] = await Promise.all([
+    fetchBackendJson('/api/dashboard/summary', token, { next: { revalidate: 60 } }),
     fetchBackendJson('/api/patients', token, { next: { revalidate: 60 } }),
     fetchBackendJson('/api/doctors', token, { next: { revalidate: 60 } }),
     fetchBackendJson('/api/appointments', token, { next: { revalidate: 60 } }),
   ]);
 
-  return { token, patients, doctors, appointments };
+  return { token, summary, patients, doctors, appointments };
 }
 
 export default async function DashboardPage() {
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       token={data.token}
+      summary={data.summary?.data || null}
       totalPatients={totalPatients}
       totalDoctors={totalDoctors}
       totalAppointments={totalAppointments}

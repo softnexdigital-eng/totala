@@ -1,31 +1,77 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import AgentDashboardLayout from '@/components/layout/AgentDashboardLayout';
-import { getStatusLabel, getStatusColor } from '@/lib/appointmentStatus';
 
-interface TaskAppointment {
+interface Task {
   id: string;
-  patient?: { id: string; name: string; phone?: string };
-  doctor?: { id: string; name: string; specialization?: string };
-  hospital?: string;
-  date: string;
-  status: string;
-  serviceType: string;
-  serviceFee: number;
-  discountPercent?: number;
+  taskStatus: string;
+  specialInstructions?: string;
+  notes?: string;
+  appointment: {
+    id: string;
+    date: string;
+    serviceType: string;
+    serviceFee: number;
+    patient?: { name: string; phone?: string };
+    doctor?: { name: string; specialization?: string };
+    hospital?: string;
+  };
+  agent: {
+    id: string;
+    name: string;
+  };
+  payments: Payment[];
 }
 
+interface Payment {
+  id: string;
+  amount: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  paymentDate?: string;
+  notes?: string;
+}
+
+const TASK_STATUSES = [
+  { value: 'ASSIGNED', label: 'Assigned' },
+  { value: 'RECEIVED', label: 'Received' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'SERVICE_COMPLETED', label: 'Service Completed' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'CANCELLED', label: 'Cancelled' },
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  PENDING: 'bg-gray-100 text-gray-800',
+  ASSIGNED: 'bg-blue-100 text-blue-800',
+  ACCEPTED: 'bg-indigo-100 text-indigo-800',
+  IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
+  SERVICE_COMPLETED: 'bg-purple-100 text-purple-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  CANCELLED: 'bg-red-100 text-red-800',
+};
+
 export default function AgentDashboardPage() {
-  const [tasks, setTasks] = useState<TaskAppointment[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [discounts, setDiscounts] = useState<Record<string, string>>({});
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
+  const router = useRouter();
+  const [endForm, setEndForm] = useState<Record<string, { discountAmount: string; transactionId: string; bkashNumber: string }>>({});
+
+  const getAgentToken = () => {
+    const match = document.cookie.match(/(?:^|; )agentToken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  };
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch('/api/appointments');
+      const token = getAgentToken();
+      const res = await fetch('/api/tasks', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+      });
       const data = await res.json();
       if (data.success) setTasks(data.data || []);
       else toast.error(data.message || 'Failed to load tasks');
@@ -35,58 +81,170 @@ export default function AgentDashboardPage() {
   };
 
   useEffect(() => {
-    let mounted = true;
-    fetchTasks().then(() => mounted && setLoading(false));
-    return () => {
-      mounted = false;
-    };
+    fetchTasks().finally(() => setLoading(false));
   }, []);
 
-  const transition = async (id: string, status: string) => {
-    if (status === 'ongoing') {
-      const confirmed = window.confirm('Start this task (mark as Ongoing)?');
-      if (!confirmed) return;
-    }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchTasks();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
-    const body: Record<string, unknown> = { status };
-
-    if (status === 'completed') {
-      const discount = discounts[id]?.trim();
-      if (!discount) {
-        toast.error('Please enter the discount percentage first');
-        return;
-      }
-      const num = Number(discount);
-      if (Number.isNaN(num) || num < 0 || num > 100) {
-        toast.error('Discount must be between 0 and 100');
-        return;
-      }
-      body.discountPercent = num;
-    }
-
-    setBusyId(id);
+  const handleReceiveTask = async (taskId: string) => {
+    setUpdating(true);
     try {
-      const res = await fetch(`/api/appointments/${id}/status`, {
+      const token = getAgentToken();
+      const res = await fetch(`/api/tasks/${taskId}/receive`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Task received');
+        setTasks((prev) => prev.map((t) => (t.id === taskId ? data.data : t)));
+      } else {
+        toast.error(data.message || 'Failed to receive task');
+      }
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleStartTask = async (taskId: string) => {
+    setUpdating(true);
+    try {
+      const token = getAgentToken();
+      const res = await fetch(`/api/tasks/${taskId}/start`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Patient received, timer started');
+        setTasks((prev) => prev.map((t) => (t.id === taskId ? data.data : t)));
+      } else {
+        toast.error(data.message || 'Failed to start task');
+      }
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleEndTask = async (taskId: string) => {
+    setUpdating(true);
+    try {
+      const token = getAgentToken();
+      const form = endForm[taskId] || { discountAmount: '', transactionId: '', bkashNumber: '' };
+      const res = await fetch(`/api/tasks/${taskId}/end`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          discountAmount: parseFloat(form.discountAmount) || 0,
+          transactionId: form.transactionId,
+          bkashNumber: form.bkashNumber,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Task ended');
+        setTasks((prev) => prev.map((t) => (t.id === taskId ? data.data : t)));
+        setEndForm((prev) => {
+          const next = { ...prev };
+          delete next[taskId];
+          return next;
+        });
+      } else {
+        toast.error(data.message || 'Failed to end task');
+      }
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleStatusUpdate = async (taskId: string, taskStatus: string) => {
+    setUpdating(true);
+    try {
+      const token = getAgentToken();
+      const res = await fetch(`/api/tasks/${taskId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ taskStatus }),
       });
       const data = await res.json();
       if (data.success) {
         toast.success('Task status updated');
+        setTasks((prev) => prev.map((t) => (t.id === taskId ? data.data : t)));
       } else {
         toast.error(data.message || 'Failed to update task');
       }
-      await fetchTasks();
     } catch {
       toast.error('Something went wrong');
     } finally {
-      setBusyId(null);
+      setUpdating(false);
     }
+  };
+
+  const getStatusColor = (status: string) => STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
+
+  const canEndTask = (task: Task) => {
+    const form = endForm[task.id];
+    if (!form) return false;
+    return form.discountAmount !== '' && form.transactionId.trim() !== '' && form.bkashNumber.trim() !== '';
+  };
+
+  const updateEndForm = (taskId: string, field: string, value: string) => {
+    setEndForm((prev) => ({
+      ...prev,
+      [taskId]: {
+        ...(prev[taskId] || { discountAmount: '', transactionId: '', bkashNumber: '' }),
+        [field]: value,
+      },
+    }));
   };
 
   return (
     <AgentDashboardLayout>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Welcome, Agent</h1>
+        <p className="text-gray-600 mt-2">Manage your tasks and payments</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-700">Total Tasks</h3>
+          <p className="text-3xl font-bold text-blue-600 mt-2">{tasks.length}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-700">Pending Tasks</h3>
+          <p className="text-3xl font-bold text-yellow-600 mt-2">
+            {tasks.filter((t) => t.taskStatus === 'PENDING' || t.taskStatus === 'ASSIGNED').length}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-700">Completed Tasks</h3>
+          <p className="text-3xl font-bold text-green-600 mt-2">
+            {tasks.filter((t) => t.taskStatus === 'COMPLETED').length}
+          </p>
+        </div>
+      </div>
+
       <h2 className="text-2xl font-bold mb-6">My Tasks</h2>
 
       {loading ? (
@@ -100,107 +258,138 @@ export default function AgentDashboardPage() {
           {tasks.map((task) => (
             <div
               key={task.id}
-              className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500"
+              onClick={() => router.push(`/agent-dashboard/tasks/${task.id}`)}
+              className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500 cursor-pointer hover:shadow-lg transition-shadow"
             >
               <div className="flex justify-between items-start mb-4">
                 <p className="text-sm text-gray-600">
-                  {new Date(task.date).toLocaleString()}
+                  {new Date(task.appointment.date).toLocaleString()}
                 </p>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
-                  {getStatusLabel(task.status)}
+                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(task.taskStatus)}`}>
+                  {task.taskStatus}
                 </span>
               </div>
 
               <div className="space-y-2 mb-4">
                 <p className="text-sm">
                   <span className="font-medium">Patient:</span>{' '}
-                  {task.patient?.name || 'Not assigned'}
+                  {task.appointment.patient?.name || 'Not assigned'}
                 </p>
                 <p className="text-sm">
                   <span className="font-medium">Doctor:</span>{' '}
-                  {task.doctor?.name || 'N/A'}{' '}
-                  {task.doctor?.specialization ? `(${task.doctor.specialization})` : ''}
+                  {task.appointment.doctor?.name || 'N/A'}{' '}
+                  {task.appointment.doctor?.specialization ? `(${task.appointment.doctor.specialization})` : ''}
                 </p>
-                {task.hospital && (
+                {task.appointment.hospital && (
                   <p className="text-sm">
-                    <span className="font-medium">Hospital:</span> {task.hospital}
+                    <span className="font-medium">Hospital:</span> {task.appointment.hospital}
                   </p>
                 )}
                 <p className="text-sm">
                   <span className="font-medium">Service:</span>{' '}
-                  <span className="capitalize">{task.serviceType}</span> — {task.serviceFee} BDT
+                  <span className="capitalize">{task.appointment.serviceType}</span> — {task.appointment.serviceFee} BDT
                 </p>
-                {task.status === 'completed' && (
+                {task.specialInstructions && (
                   <p className="text-sm">
-                    <span className="font-medium">Discount Given:</span>{' '}
-                    <span className="text-green-600 font-semibold">
-                      {task.discountPercent ?? 0}%
-                    </span>
+                    <span className="font-medium">Instructions:</span> {task.specialInstructions}
+                  </p>
+                )}
+                {task.notes && (
+                  <p className="text-sm">
+                    <span className="font-medium">Notes:</span> {task.notes}
                   </p>
                 )}
               </div>
 
               <div className="pt-3 border-t">
-                {task.status === 'pending' && (
-                  <p className="text-sm text-yellow-700">Awaiting admin approval.</p>
-                )}
-
-                {task.status === 'confirmed' && (
+                {task.taskStatus === 'ASSIGNED' && (
                   <button
-                    onClick={() => transition(task.id, 'received')}
-                    disabled={busyId === task.id}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReceiveTask(task.id);
+                    }}
+                    disabled={updating}
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium mb-2"
                   >
                     Receive Task
                   </button>
                 )}
-
-                {task.status === 'received' && (
+                {task.taskStatus === 'RECEIVED' && (
                   <button
-                    onClick={() => transition(task.id, 'ongoing')}
-                    disabled={busyId === task.id}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartTask(task.id);
+                    }}
+                    disabled={updating}
+                    className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 text-sm font-medium mb-2"
                   >
-                    Task Ongoing (Start)
+                    Receive Patient
                   </button>
                 )}
-
-                {task.status === 'ongoing' && (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Discount (%)
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={discounts[task.id] ?? ''}
-                        onChange={(e) =>
-                          setDiscounts((prev) => ({ ...prev, [task.id]: e.target.value }))
-                        }
-                        placeholder="e.g. 10"
-                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
+                  <select
+                    value={task.taskStatus}
+                    onChange={(e) => handleStatusUpdate(task.id, e.target.value)}
+                    className="w-full text-sm border rounded px-2 py-2"
+                  >
+                    <option value="ASSIGNED">Assigned</option>
+                    <option value="RECEIVED">Received</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="SERVICE_COMPLETED">Service Completed</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                )}
+                 {task.taskStatus === 'IN_PROGRESS' && (
+                   <div className="space-y-2">
+                     <input
+                       type="number"
+                       placeholder="Discount Amount"
+                       value={endForm[task.id]?.discountAmount ?? ''}
+                       onClick={(e) => e.stopPropagation()}
+                       onChange={(e) => updateEndForm(task.id, 'discountAmount', e.target.value)}
+                       className="w-full text-sm border rounded px-2 py-2"
+                     />
+                     <input
+                       type="text"
+                       placeholder="Transaction ID"
+                       value={endForm[task.id]?.transactionId ?? ''}
+                       onClick={(e) => e.stopPropagation()}
+                       onChange={(e) => updateEndForm(task.id, 'transactionId', e.target.value)}
+                       className="w-full text-sm border rounded px-2 py-2"
+                     />
+                     <input
+                       type="text"
+                       placeholder="bKash Number"
+                       value={endForm[task.id]?.bkashNumber ?? ''}
+                       onClick={(e) => e.stopPropagation()}
+                       onChange={(e) => updateEndForm(task.id, 'bkashNumber', e.target.value)}
+                       className="w-full text-sm border rounded px-2 py-2"
+                     />
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         handleEndTask(task.id);
+                       }}
+                       disabled={updating || !canEndTask(task)}
+                       className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm font-medium"
+                     >
+                       End Task
+                     </button>
+                   </div>
+                 )}
+                {task.taskStatus === 'SERVICE_COMPLETED' && (
+                  <div className="text-sm text-green-700 font-medium">This task was completely ended</div>
+                )}
+                {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
+                  <div className="mt-3 flex gap-2">
                     <button
-                      onClick={() => transition(task.id, 'completed')}
-                      disabled={busyId === task.id}
-                      className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                      onClick={() => router.push(`/payments?taskId=${task.id}`)}
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm"
                     >
-                      End Task
+                      Add Payment
                     </button>
                   </div>
-                )}
-
-                {task.status === 'completed' && (
-                  <p className="text-center text-sm text-green-700 font-medium">
-                    Task Completed
-                  </p>
-                )}
-
-                {task.status === 'cancelled' && (
-                  <p className="text-center text-sm text-red-600">Task Cancelled</p>
                 )}
               </div>
             </div>

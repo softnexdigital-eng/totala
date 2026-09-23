@@ -13,7 +13,7 @@ interface Test {
   status: string;
   appointment: {
     patient: { name: string };
-    doctor: { name: string };
+    doctor?: { name: string };
   };
 }
 
@@ -98,7 +98,7 @@ export default function TestsClient({ initialTests }: TestsClientProps) {
                     {test.appointment.patient.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {test.appointment.doctor.name}
+                    {test.appointment.doctor?.name || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{test.actualCost} BDT</td>
                   <td className="px-6 py-4 whitespace-nowrap">{test.discountPercent}%</td>

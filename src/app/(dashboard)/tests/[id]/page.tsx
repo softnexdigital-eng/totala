@@ -14,7 +14,7 @@ interface TestDetail {
   status: string;
   appointment: {
     patient: { name: string };
-    doctor: { name: string };
+    doctor?: { name: string };
   };
 }
 
@@ -53,7 +53,7 @@ export default async function TestDetailPage({
 
         <div>
           <label className="block text-sm font-medium text-gray-500">Doctor</label>
-          <p className="text-lg">{test.appointment.doctor.name}</p>
+          <p className="text-lg">{test.appointment.doctor?.name || 'Not assigned'}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-4">

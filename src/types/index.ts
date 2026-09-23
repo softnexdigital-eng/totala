@@ -3,6 +3,7 @@ export interface Patient {
   name: string;
   phone: string;
   age?: number;
+  gender?: string;
   address?: string;
   isRegistered: boolean;
   createdAt: string;
@@ -92,4 +93,61 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
   error: string | null;
+}
+
+/** Public-facing agent profile shown on the landing page. */
+export interface AgentProfile {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  photo?: string;
+  averageRating?: number;
+  completedTasks?: number;
+  area?: string;
+  services?: string[];
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** A booking request submitted from the public landing page. */
+export interface BookingRequest {
+  id: string;
+  patientId?: string;
+  patientName: string;
+  patientPhone: string;
+  patientAge?: number;
+  patientGender?: string;
+  patientAddress?: string;
+  agentId?: string;
+  agentName?: string;
+  agent?: { id: string; name: string };
+  serviceNeeded: string;
+  preferredDate?: string;
+  preferredTime?: string;
+  hospital?: string;
+  bookingReason?: string;
+  additionalNote?: string;
+  status: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** Payload submitted by the Book Now modal on the landing page. */
+export interface AgentBookingPayload {
+  agentId?: string;
+  serviceNeeded?: string;
+  preferredDate?: string;
+  preferredTime?: string;
+  hospital?: string;
+  bookingReason?: string;
+  additionalNote?: string;
+  patient: {
+    name: string;
+    phone: string;
+    age: string;
+    gender?: string;
+    address: string;
+  };
 }

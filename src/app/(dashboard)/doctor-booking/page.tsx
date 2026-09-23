@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import SearchablePatientSelect from '@/components/forms/SearchablePatientSelect';
 import { getStatusLabel as getStatusLabelFn, getStatusColor as getStatusColorFn } from '@/lib/appointmentStatus';
 
 interface Doctor {
@@ -795,20 +796,14 @@ export default function DoctorBookingPage() {
 
             <form id="booking-form" onSubmit={handleSubmitBooking} className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Patient *</label>
-                <select
+                                <label className="mb-1 block text-sm font-medium text-slate-700">Patient *</label>
+                <SearchablePatientSelect
+                  patients={patients}
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-                  className="min-h-[44px] w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                  onSelect={(p) => setFormData({ ...formData, patientId: p.id })}
+                  placeholder="Search by name or phone..."
                   required
-                >
-                  <option value="">Select Patient</option>
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.phone})
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
