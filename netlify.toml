@@ -14,5 +14,13 @@
   # Next.js 14 requires Node >= 18.17
   NODE_VERSION = "20"
 
-# The Next.js runtime (@netlify/plugin-nextjs) is auto-installed by Netlify
-# when it detects Next.js, so it is intentionally not pinned here.
+# Force-install the Next.js adapter (OpenNext runtime).
+# Without this, if the site's Framework preset in the Netlify UI is "None",
+# Netlify publishes the raw .next/ directory as static files. Since .next/
+# has no index.html at its root, every URL returns Netlify's default
+# "Page not found" 404. The adapter converts SSR pages, API routes and
+# middleware into Netlify Functions / Edge Functions instead.
+# No version is pinned here, so Netlify installs the latest adapter each build.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
