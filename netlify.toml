@@ -1,0 +1,18 @@
+# Netlify configuration for this Next.js 14 (App Router) project.
+#
+# Without this file, Netlify may not apply the Next.js adapter and instead
+# publish the repo as a static folder. Since there is no index.html in the
+# repo, every path then returns Netlify's default "Page not found" 404.
+#
+# Docs: https://docs.netlify.com/frameworks/next-js/overview/
+
+[build]
+  command = "next build"
+  publish = ".next"
+
+[build.environment]
+  # Next.js 14 requires Node >= 18.17
+  NODE_VERSION = "20"
+
+# The Next.js runtime (@netlify/plugin-nextjs) is auto-installed by Netlify
+# when it detects Next.js, so it is intentionally not pinned here.
