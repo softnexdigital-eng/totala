@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import AgentSidebar from '@/components/layout/AgentSidebar';
 import Header from '@/components/layout/Header';
@@ -16,32 +16,54 @@ interface Agent {
   permissions?: Record<string, boolean>;
 }
 
-/**
- * Renders the shell around the routed page.
- *
- * The admin sidebar is `fixed` on desktop, so the content column is offset by
- * the sidebar's width via a left margin. Because the width is driven by the
- * shared collapse state, the margin animates in lockstep with the sidebar
- * (w-72 -> w-20) whenever the user minimises or expands it.
- */
+const ROUTE_PERMISSION_MAP: Record<string, string> = {
+  '/dashboard': 'dashboard',
+  '/patients': 'patients',
+  '/doctors': 'doctors',
+  '/agents': 'agents',
+  '/permissions': 'permissions',
+  '/packages': 'packages',
+  '/appointments': 'appointments',
+  '/doctor-booking': 'doctorBooking',
+  '/tests': 'tests',
+  '/reports': 'reports',
+  '/tasks': 'tasks',
+  '/payments': 'payments',
+  '/audit': 'audit',
+  '/bookings': 'bookings',
+  '/agents/ratings': 'agentRatings',
+  '/transport': 'transport',
+};
+
 function DashboardShell({
   children,
   showAdminSidebar,
   showAgentSidebar,
   agentPermissions,
+  isAdmin,
 }: {
   children: React.ReactNode;
   showAdminSidebar: boolean;
   showAgentSidebar: boolean;
   agentPermissions: Record<string, boolean>;
+  isAdmin: boolean;
 }) {
-  const { collapsed } = useSidebar();
+  const { collapsed, toggleCollapsed, mobileOpen, setMobileOpen } = useSidebar();
 
   const contentOffset = showAdminSidebar ? (collapsed ? 'lg:ml-20' : 'lg:ml-72') : '';
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {showAdminSidebar && <Sidebar />}
+      {showAdminSidebar && (
+        <Sidebar
+          collapsed={collapsed}
+          toggleCollapsed={toggleCollapsed}
+          mobileOpen={mobileOpen}
+          setMobileOpen={setMobileOpen}
+          permissions={agentPermissions}
+          isAdmin={isAdmin}
+        />
+      )}
       {showAgentSidebar && <AgentSidebar permissions={agentPermissions} />}
       <div
         className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${contentOffset}`}
@@ -65,6 +87,7 @@ export default function DashboardLayoutClient({
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const agentCookie = document.cookie
@@ -107,11 +130,24 @@ export default function DashboardLayoutClient({
     };
   }, []);
 
+  useEffect(() => {
+    if (loading) return;
+
+    const permissions = agent?.permissions || {};
+    const isAdmin = hasAdminToken || pathname.startsWith('/permissions');
+    const requiredPermission = ROUTE_PERMISSION_MAP[pathname];
+
+    if (!isAdmin && requiredPermission && permissions[requiredPermission] !== true) {
+      router.replace('/agent-dashboard');
+    }
+  }, [loading, pathname, hasAdminToken, agent, router]);
+
   const isAgentRoute = pathname.startsWith('/agent-dashboard');
   const isAdminOnlyRoute = pathname.startsWith('/permissions');
 
-  const showAgentSidebar = Boolean(isAgentRoute || (!hasAdminToken && agent && !isAdminOnlyRoute));
-  const showAdminSidebar = !showAgentSidebar;
+  const showAgentSidebar = Boolean(isAgentRoute);
+  const showAdminSidebar = !isAgentRoute;
+  const isAdmin = (hasAdminToken && !agent) || pathname.startsWith('/permissions');
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -123,6 +159,7 @@ export default function DashboardLayoutClient({
         showAdminSidebar={showAdminSidebar}
         showAgentSidebar={showAgentSidebar}
         agentPermissions={agent?.permissions || {}}
+        isAdmin={isAdmin}
       >
         {children}
       </DashboardShell>

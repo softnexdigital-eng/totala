@@ -326,20 +326,24 @@ export default function AgentDashboardPage() {
                     Receive Patient
                   </button>
                 )}
-                {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
-                  <select
-                    value={task.taskStatus}
-                    onChange={(e) => handleStatusUpdate(task.id, e.target.value)}
-                    className="w-full text-sm border rounded px-2 py-2"
-                  >
-                    <option value="ASSIGNED">Assigned</option>
-                    <option value="RECEIVED">Received</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="SERVICE_COMPLETED">Service Completed</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="CANCELLED">Cancelled</option>
-                  </select>
-                )}
+                 {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
+                   <select
+                     value={task.taskStatus}
+                     onClick={(e) => e.stopPropagation()}
+                     onChange={(e) => {
+                       e.stopPropagation();
+                       handleStatusUpdate(task.id, e.target.value);
+                     }}
+                     className="w-full text-sm border rounded px-2 py-2"
+                   >
+                     <option value="ASSIGNED">Assigned</option>
+                     <option value="RECEIVED">Received</option>
+                     <option value="IN_PROGRESS">In Progress</option>
+                     <option value="SERVICE_COMPLETED">Service Completed</option>
+                     <option value="COMPLETED">Completed</option>
+                     <option value="CANCELLED">Cancelled</option>
+                   </select>
+                 )}
                  {task.taskStatus === 'IN_PROGRESS' && (
                    <div className="space-y-2">
                      <input
@@ -381,16 +385,19 @@ export default function AgentDashboardPage() {
                 {task.taskStatus === 'SERVICE_COMPLETED' && (
                   <div className="text-sm text-green-700 font-medium">This task was completely ended</div>
                 )}
-                {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => router.push(`/payments?taskId=${task.id}`)}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm"
-                    >
-                      Add Payment
-                    </button>
-                  </div>
-                )}
+                 {(task.taskStatus === 'ASSIGNED' || task.taskStatus === 'RECEIVED') && (
+                   <div className="mt-3 flex gap-2">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         router.push(`/payments?taskId=${task.id}`);
+                       }}
+                       className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm"
+                     >
+                       Add Payment
+                     </button>
+                   </div>
+                 )}
               </div>
             </div>
           ))}

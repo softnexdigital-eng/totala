@@ -30,6 +30,8 @@ export function middleware(request: NextRequest) {
     '/audit',
     '/bookings',
     '/agents/ratings',
+    '/transport',
+    '/agent-booking-requests',
   ];
   const isAdminRoute = adminRoutes.includes(pathname) || pathname.startsWith('/dashboard/');
 

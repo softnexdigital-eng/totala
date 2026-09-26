@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -29,8 +28,13 @@ import {
   Building2,
   Sparkles,
   CalendarCheck,
+  Car,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import AgentCard from '@/components/booking/AgentCard';
+import BookNowModal from '@/components/booking/BookNowModal';
+import TransportBookingModal from '@/components/booking/TransportBookingModal';
+import type { AgentProfile } from '@/types';
 
 const services = [
   {
@@ -58,12 +62,12 @@ const services = [
     href: '/diagnostics',
   },
   {
-    title: 'অ্যাম্বুলেন্স',
-    subtitle: 'জরুরি পরিবহন সেবা',
-    icon: Ambulance,
+    title: 'যানবাহন বুকিং',
+    subtitle: 'অ্যাম্বুলেন্স, কার, সিএনজি সেবা',
+    icon: Car,
     image:
-      'https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=900&q=85',
-    href: '/ambulance',
+      'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=900&q=85',
+    href: '#transport',
   },
   {
     title: 'ফার্মেসি',
@@ -128,11 +132,13 @@ const popularDoctors = [
 
 export default function LandingPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [agents, setAgents] = useState<any[]>([]);
+  const [agents, setAgents] = useState<AgentProfile[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
+  const [selectedAgent, setSelectedAgent] = useState<AgentProfile | null>(null);
+  const [transportVehicle, setTransportVehicle] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/public-agents')
+    fetch('/api/public-agents', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -144,6 +150,9 @@ export default function LandingPage() {
         setLoadingAgents(false);
       });
   }, []);
+
+  // Same filtering rule the public agents directory uses, so both views stay in sync.
+  const activeAgents = agents.filter((agent) => agent.isActive !== false);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-white text-slate-900">
@@ -166,7 +175,7 @@ export default function LandingPage() {
                 Dak<span className="text-emerald-600">Din</span>
               </div>
               <div className="-mt-1 text-[8px] font-bold tracking-[0.28em] text-slate-400">
-                HEALTH & SERVICES
+                Sheba Nin
               </div>
             </div>
           </Link>
@@ -556,6 +565,41 @@ export default function LandingPage() {
             {services.map((service) => {
 
               const Icon = service.icon;
+              const isTransport = service.href === '#transport';
+
+              if (isTransport) {
+                return (
+                  <button
+                    key={service.title}
+                    onClick={() => setTransportVehicle('car')}
+                    className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/10 text-left"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        fill
+                        className="object-cover transition duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/5 to-transparent" />
+                      <div className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center rounded-xl border border-white/30 bg-white/90 text-emerald-600 shadow-lg backdrop-blur">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <div className="text-lg font-black">{service.title}</div>
+                        <div className="mt-1 text-xs text-white/75">{service.subtitle}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-5">
+                      <span className="text-sm font-bold text-slate-700">বুক করুন</span>
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 transition group-hover:bg-emerald-600 group-hover:text-white">
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </button>
+                );
+              }
 
               return (
                 <Link
@@ -563,10 +607,7 @@ export default function LandingPage() {
                   key={service.title}
                   className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/10"
                 >
-
-                  {/* Image */}
                   <div className="relative aspect-[16/10] overflow-hidden">
-
                     <Image
                       src={service.image}
                       alt={service.title}
@@ -574,42 +615,21 @@ export default function LandingPage() {
                       className="object-cover transition duration-700 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, 25vw"
                     />
-
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/5 to-transparent" />
-
-                    {/* Icon */}
                     <div className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center rounded-xl border border-white/30 bg-white/90 text-emerald-600 shadow-lg backdrop-blur">
                       <Icon className="h-5 w-5" />
                     </div>
-
                     <div className="absolute bottom-4 left-4 right-4 text-white">
-
-                      <div className="text-lg font-black">
-                        {service.title}
-                      </div>
-
-                      <div className="mt-1 text-xs text-white/75">
-                        {service.subtitle}
-                      </div>
-
+                      <div className="text-lg font-black">{service.title}</div>
+                      <div className="mt-1 text-xs text-white/75">{service.subtitle}</div>
                     </div>
-
                   </div>
-
-
-                  {/* Bottom */}
                   <div className="flex items-center justify-between p-5">
-
-                    <span className="text-sm font-bold text-slate-700">
-                      বিস্তারিত দেখুন
-                    </span>
-
+                    <span className="text-sm font-bold text-slate-700">বিস্তারিত দেখুন</span>
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 transition group-hover:bg-emerald-600 group-hover:text-white">
                       <ArrowRight className="h-4 w-4" />
                     </div>
-
                   </div>
-
                 </Link>
               );
             })}
@@ -868,7 +888,7 @@ export default function LandingPage() {
                 </span>
               </h2>
               <p className="mt-4 max-w-xl leading-7 text-slate-500">
-                আমাদের অত্যন্ত সুনিয়ন্ত্রিত এবং রেটিংযুক্ত এজেন্ট们 সেবা নিশ্চিত করুন
+                আমাদের অত্যন্ত সুনিয়ন্ত্রিত এবং রেটিংযুক্ত এজেন্ট সেবা নিশ্চিত করুন
               </p>
             </div>
             <Link
@@ -880,70 +900,22 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {loadingAgents ? (
               <div className="col-span-full text-center py-12">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent"></div>
               </div>
-            ) : agents.length === 0 ? (
+            ) : activeAgents.length === 0 ? (
               <div className="col-span-full text-center py-12 text-slate-500">
                 No agents available at the moment
               </div>
             ) : (
-              agents.slice(0, 8).map((agent: any) => (
-                <div
+              activeAgents.map((agent) => (
+                <AgentCard
                   key={agent.id}
-                  className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-slate-900/10"
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-emerald-50 to-green-50">
-                    {agent.photo ? (
-                      <Image
-                        src={agent.photo}
-                        alt={agent.name}
-                        fill
-                        className="object-cover transition duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, 25vw"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white text-4xl font-bold">
-                          {agent.name?.charAt(0)?.toUpperCase() || 'A'}
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <div className="text-lg font-black">{agent.name}</div>
-                      {agent.area && (
-                        <div className="mt-1 flex items-center gap-1 text-xs text-white/75">
-                          <MapPin className="h-3 w-3" />
-                          {agent.area}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-bold text-slate-900">
-                          {agent.averageRating?.toFixed(1) || '0.0'}
-                        </span>
-                      </div>
-                      <span className="text-xs text-slate-500">
-                        {agent.completedTasks || 0} tasks
-                      </span>
-                    </div>
-
-                    <Link
-                      href={`/bookings/new?agentId=${agent.id}`}
-                      className="mt-4 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 py-2.5 text-sm font-bold text-white transition hover:shadow-lg"
-                    >
-                      Book Now
-                    </Link>
-                  </div>
-                </div>
+                  agent={agent}
+                  onBookNow={setSelectedAgent}
+                />
               ))
             )}
           </div>
@@ -1282,7 +1254,22 @@ export default function LandingPage() {
 
       </footer>
 
+      {/* Book Now modal — identical booking flow to the /public-agents directory */}
+      {selectedAgent && (
+        <BookNowModal
+          agent={selectedAgent}
+          onClose={() => setSelectedAgent(null)}
+        />
+      )}
+
+      {/* Transport booking modal */}
+      {transportVehicle && (
+        <TransportBookingModal
+          vehicleType={transportVehicle}
+          onClose={() => setTransportVehicle(null)}
+        />
+      )}
+
     </main>
   );
 }
-

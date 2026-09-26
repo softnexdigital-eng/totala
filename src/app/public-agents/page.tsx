@@ -45,12 +45,12 @@ export default function PublicAgentsPage() {
           </div>
           <span className="text-2xl font-bold text-gray-900">DakDin</span>
         </Link>
-        <Link
+        {/* <Link
           href="/login"
           className="rounded-lg bg-green-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
         >
           Login
-        </Link>
+        </Link> */}
       </nav>
 
       <main className="px-6 py-16 lg:px-12">

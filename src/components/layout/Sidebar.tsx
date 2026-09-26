@@ -21,52 +21,53 @@ import {
   HiMenu,
   HiChevronDoubleLeft,
   HiChevronDoubleRight,
+  HiTruck,
 } from 'react-icons/hi';
-import { useSidebar } from '@/components/layout/SidebarContext';
 
-type MenuItem = { href: string; label: string; icon: typeof HiChartBar };
+type MenuItem = { href: string; label: string; icon: typeof HiChartBar; key: string };
 
-/**
- * Navigation is grouped into labelled sections so the long list stays
- * scannable. Section headings collapse into thin dividers when the sidebar
- * is minimised.
- */
+const ALL_MENU_ITEMS: MenuItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: HiChartBar, key: 'dashboard' },
+  { href: '/patients', label: 'Patients', icon: HiUserGroup, key: 'patients' },
+  { href: '/doctors', label: 'Doctors', icon: HiUser, key: 'doctors' },
+  { href: '/agents', label: 'Agents', icon: HiUsers, key: 'agents' },
+  { href: '/permissions', label: 'Permissions', icon: HiLockClosed, key: 'permissions' },
+  { href: '/packages', label: 'Manage Packages', icon: HiCube, key: 'packages' },
+  { href: '/tests', label: 'Tests', icon: HiLightBulb, key: 'tests' },
+  { href: '/appointments', label: 'Manage Appointments', icon: HiCalendar, key: 'appointments' },
+  { href: '/doctor-booking', label: 'Doctor Booking', icon: HiDocumentText, key: 'doctorBooking' },
+  { href: '/tasks', label: 'Tasks', icon: HiClipboardList, key: 'tasks' },
+  { href: '/payments', label: 'Payments', icon: HiCurrencyDollar, key: 'payments' },
+  { href: '/bookings', label: 'Online Bookings', icon: HiCalendar, key: 'bookings' },
+  { href: '/agent-booking-requests', label: 'Agent Booking Requests', icon: HiUser, key: 'agentBookingRequests' },
+  { href: '/agents/ratings', label: 'Agent Ratings', icon: HiStar, key: 'agentRatings' },
+  { href: '/audit', label: 'Audit Report', icon: HiDocumentReport, key: 'audit' },
+  { href: '/reports', label: 'Reports', icon: HiTable, key: 'reports' },
+  { href: '/transport', label: 'Transport Bookings', icon: HiTruck, key: 'transport' },
+];
+
 const menuSections: { title: string; items: MenuItem[] }[] = [
   {
     title: 'Overview',
-    items: [{ href: '/dashboard', label: 'Dashboard', icon: HiChartBar }],
+    items: ALL_MENU_ITEMS.filter((item) => item.key === 'dashboard'),
   },
   {
     title: 'Management',
-    items: [
-      { href: '/patients', label: 'Patients', icon: HiUserGroup },
-      { href: '/doctors', label: 'Doctors', icon: HiUser },
-      { href: '/agents', label: 'Agents', icon: HiUsers },
-      { href: '/permissions', label: 'Permissions', icon: HiLockClosed },
-      { href: '/packages', label: 'Manage Packages', icon: HiCube },
-     
-      { href: '/tests', label: 'Tests', icon: HiLightBulb },
-     
-    ],
+    items: ALL_MENU_ITEMS.filter((item) =>
+      ['patients', 'doctors', 'agents', 'permissions', 'packages', 'tests'].includes(item.key)
+    ),
   },
   {
     title: 'Bookings',
-    items: [
-      { href: '/appointments', label: 'Manage Appointments', icon: HiCalendar },
-      { href: '/doctor-booking', label: 'Doctor Booking', icon: HiDocumentText },
-      { href: '/tasks', label: 'Tasks', icon: HiClipboardList },
-      { href: '/payments', label: 'Payments', icon: HiCurrencyDollar },
-      { href: '/bookings', label: 'Online Bookings', icon: HiCalendar },
-      { href: '/agent-booking-requests', label: 'Agent Booking Requests', icon: HiUser },
-      { href: '/agents/ratings', label: 'Agent Ratings', icon: HiStar },
-    ],
+    items: ALL_MENU_ITEMS.filter((item) =>
+      ['appointments', 'doctorBooking', 'tasks', 'payments', 'bookings', 'agentBookingRequests', 'agentRatings', 'transport'].includes(item.key)
+    ),
   },
   {
     title: 'Insights',
-    items: [
-      { href: '/audit', label: 'Audit Report', icon: HiDocumentReport },
-      { href: '/reports', label: 'Reports', icon: HiTable },
-    ],
+    items: ALL_MENU_ITEMS.filter((item) =>
+      ['audit', 'reports'].includes(item.key)
+    ),
   },
 ];
 
@@ -74,12 +75,18 @@ function SidebarContent({
   collapsed,
   onNavigate,
   onClose,
+  permissions,
+  isAdmin,
 }: {
   collapsed: boolean;
   onNavigate?: () => void;
   onClose?: () => void;
+  permissions: Record<string, boolean>;
+  isAdmin: boolean;
 }) {
   const pathname = usePathname();
+  const normalizedPermissions = typeof permissions === 'object' && permissions !== null ? permissions : {};
+  const allowedItems = isAdmin ? ALL_MENU_ITEMS : ALL_MENU_ITEMS.filter((item) => normalizedPermissions[item.key] === true);
 
   return (
     <>
@@ -120,58 +127,63 @@ function SidebarContent({
 
       {/* Scrollable navigation */}
       <nav className="sidebar-scroll flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-3 py-4">
-        {menuSections.map((section, index) => (
-          <div key={section.title}>
-            {collapsed ? (
-              index > 0 && <div className="mx-2 mb-2 border-t border-white/10" />
-            ) : (
-              <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
-                {section.title}
-              </p>
-            )}
+        {menuSections.map((section, index) => {
+          const sectionItems = section.items.filter((item) => allowedItems.some((allowed) => allowed.key === item.key));
+          if (sectionItems.length === 0) return null;
 
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
+          return (
+            <div key={section.title}>
+              {collapsed ? (
+                index > 0 && <div className="mx-2 mb-2 border-t border-white/10" />
+              ) : (
+                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                  {section.title}
+                </p>
+              )}
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onNavigate}
-                    title={collapsed ? item.label : undefined}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`group relative flex items-center rounded-xl text-sm transition-all duration-200 ${
-                      collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2.5'
-                    } ${
-                      isActive
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
-                        : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    {isActive && !collapsed && (
-                      <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white" />
-                    )}
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+              <div className="space-y-1">
+                {sectionItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onNavigate}
+                      title={collapsed ? item.label : undefined}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`group relative flex items-center rounded-xl text-sm transition-all duration-200 ${
+                        collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2.5'
+                      } ${
                         isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                          : 'text-gray-300 hover:bg-white/5 hover:text-white'
                       }`}
                     >
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    {!collapsed && <span className="truncate font-medium">{item.label}</span>}
-                    {!collapsed && isActive && (
-                      <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
-                    )}
-                  </Link>
-                );
-              })}
+                      {isActive && !collapsed && (
+                        <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white" />
+                      )}
+                      <span
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : 'bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      {!collapsed && <span className="truncate font-medium">{item.label}</span>}
+                      {!collapsed && isActive && (
+                        <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
     </>
   );
@@ -219,9 +231,21 @@ function SidebarFooter({
   );
 }
 
-export default function Sidebar() {
-  const { collapsed, toggleCollapsed, mobileOpen, setMobileOpen } = useSidebar();
-
+export default function Sidebar({
+  collapsed,
+  toggleCollapsed,
+  mobileOpen,
+  setMobileOpen,
+  permissions,
+  isAdmin,
+}: {
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
+  permissions: Record<string, boolean>;
+  isAdmin: boolean;
+}) {
   return (
     <>
       {/* Mobile menu button */}
@@ -248,7 +272,7 @@ export default function Sidebar() {
           collapsed ? 'w-20' : 'w-72'
         }`}
       >
-        <SidebarContent collapsed={collapsed} />
+        <SidebarContent collapsed={collapsed} permissions={permissions} isAdmin={isAdmin} />
         <SidebarFooter collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
       </aside>
 
@@ -262,6 +286,8 @@ export default function Sidebar() {
           collapsed={false}
           onNavigate={() => setMobileOpen(false)}
           onClose={() => setMobileOpen(false)}
+          permissions={permissions}
+          isAdmin={isAdmin}
         />
       </aside>
     </>

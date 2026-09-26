@@ -508,7 +508,7 @@ export default function PendingAppointments({ token }: PendingAppointmentsProps)
               <div className="mt-3 space-y-2 text-sm text-slate-700">
                 <div className="flex items-center gap-2">
                   <IconUser className="h-4 w-4 flex-shrink-0 text-slate-400" />
-                  <span className="truncate">{apt.patient.name}</span>
+                  <span className="truncate">{apt.patient?.name || 'Not assigned'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="flex-shrink-0 text-xs font-medium uppercase tracking-wide text-slate-400">Dr</span>
