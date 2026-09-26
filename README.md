@@ -8,3 +8,4 @@ A Next.js 14 admin dashboard for managing patients, doctors, appointments, packa
 npm install
 npm run dev
 ```
+# totala
